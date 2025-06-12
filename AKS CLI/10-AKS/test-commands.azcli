@@ -14,7 +14,5 @@ kubectl get endpoints aks-storage-service -n storage
 
 kubectl get pods --all-namespaces
 
-git config --global user.name "Jim Vacca"
-git config user.name "Jim Vacca"
-git config --global user.email "jamesvac@microsoft.com"
-git config user.email "jamesvac@microsoft.com"
+
+

@@ -1,0 +1,51 @@
+# Set variables
+export ACR_RESOURCE_GROUP_NAME="jfv-rg-acr"
+export ACR_NAME="jfvacr"
+export LOCATION="eastus2"
+
+# Create the resource group if it doesn't exist
+az group create --name $ACR_RESOURCE_GROUP_NAME --location $LOCATION
+
+# Create Azure Container Registry (Standard SKU is recommended for most scenarios)
+az acr create \
+  --resource-group $ACR_RESOURCE_GROUP_NAME \
+  --name $ACR_NAME \
+  --sku Basic \
+  --location $LOCATION
+
+# Show details of the created ACR
+az acr show --name $ACR_NAME --resource-group $ACR_RESOURCE_GROUP_NAME
+
+# grant pull to aks cluster managed identity
+# AKS cluster must be built first
+# this sets up for Private-AKS
+export AKS_RESOURCE_GROUP_NAME=""
+export AKS_CLUSTER_NAME=""
+
+# this sets up for Spoke2-AKS
+export AKS_RESOURCE_GROUP_NAME="rg-spoke2-aks"
+export AKS_CLUSTER_NAME="spoke2-aks"
+
+az aks show \
+  --resource-group $AKS_RESOURCE_GROUP_NAME \
+  --name $AKS_CLUSTER_NAME \
+  --query "identityProfile.kubeletidentity.clientId" \
+  --output tsv
+
+KUBELET_IDENTITY_CLIENT_ID=$(az aks show \
+  --resource-group $AKS_RESOURCE_GROUP_NAME \
+  --name $AKS_CLUSTER_NAME \
+  --query "identityProfile.kubeletidentity.clientId" \
+  --output tsv)
+
+SUBSCRIPTION_ID=$(az account show --query "id" --output tsv)
+
+az role assignment create --assignee $KUBELET_IDENTITY_CLIENT_ID \
+   --role AcrPull \
+   --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$ACR_RESOURCE_GROUP_NAME/providers/Microsoft.ContainerRegistry/registries/$ACR_NAME
+
+az role assignment list \
+  --assignee $KUBELET_IDENTITY_CLIENT_ID \
+  --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$ACR_RESOURCE_GROUP_NAME/providers/Microsoft.ContainerRegistry/registries/$ACR_NAME \
+  --query "[?roleDefinitionName=='AcrPull']" \
+  --output table

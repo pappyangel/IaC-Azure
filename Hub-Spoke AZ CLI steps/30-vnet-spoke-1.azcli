@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "Creating Spoke 1 VNet"
+az network vnet create \
+  --resource-group $RG_NAME \
+  --name $SPOKE_1_VNET_NAME \
+  --address-prefix $SPOKE_1_VNET_PREFIX \
+  --subnet-name $SPOKE_1_DEFAULT_SUBNET_NAME \
+  --subnet-prefix $SPOKE_1_DEFAULT_SUBNET_PREFIX \
+  --output table >> $BATCHRUN.txt 2>&1 < /dev/null
+

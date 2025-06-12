@@ -1,0 +1,17 @@
+#!/bin/bash
+
+echo "Creating VM in Spoke VNet"
+az vm create \
+  --resource-group $RG_NAME \
+  --name $VM_SPOKE_1_NAME \
+  --image $IMAGE \
+  --vnet-name $SPOKE_1_VNET_NAME \
+  --subnet $SPOKE_1_DEFAULT_SUBNET_NAME \
+  --admin-username $VM_ADMIN_USER \
+  --admin-password $VM_ADMIN_PASSWORD \
+  --authentication-type password \
+  --public-ip-address "" \
+  --location $LOCATION \
+  --storage-sku Standard_LRS \
+  --output table >> $BATCHRUN.txt 2>&1 < /dev/null
+

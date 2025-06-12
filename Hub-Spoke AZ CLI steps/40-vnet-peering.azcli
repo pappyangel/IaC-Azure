@@ -1,0 +1,21 @@
+#!/bin/bash
+
+echo "Creating Hub-to-Spoke VNet peering"
+az network vnet peering create \
+  --resource-group $RG_NAME \
+  --name $HUB_TO_SPOKE_1_PEERING_NAME \
+  --vnet-name $HUB_VNET_NAME \
+  --remote-vnet $SPOKE_1_VNET_NAME \
+  --allow-vnet-access \
+  --allow-forwarded-traffic >> $BATCHRUN.txt 2>&1 < /dev/null
+
+echo "Creating Spoke-to-Hub VNet peering"
+az network vnet peering create \
+  --resource-group $RG_NAME \
+  --name $SPOKE1_TO_HUB_PEERING_NAME \
+  --vnet-name $SPOKE_1_VNET_NAME \
+  --remote-vnet $HUB_VNET_NAME \
+  --allow-vnet-access \
+  --allow-forwarded-traffic >> $BATCHRUN.txt 2>&1 < /dev/null
+
+

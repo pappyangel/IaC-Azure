@@ -1,0 +1,25 @@
+
+export AKS_OIDC_ISSUER=$(
+  az aks show \
+    --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME \
+    --resource-group $SPOKE_AKS_RG_NAME \
+    --query "oidcIssuerProfile.issuerUrl" \
+    -o tsv
+)
+
+export SUBSCRIPTION_ID="$(az account show --query id --output tsv)"
+
+# SQL MI
+export USER_ASSIGNED_SQL_MI="sql_mi"
+az identity create \
+  --name $USER_ASSIGNED_SQL_MI \
+  --resource-group $SPOKE_AKS_RG_NAME \
+  --location $LOCATION \
+  --SUBSCRIPTION_ID $SUBSCRIPTION_ID
+export USER_ASSIGNED_CLIENT_ID=$(
+  az identity show \
+    --resource-group $SPOKE_AKS_RG_NAME \
+    --name $USER_ASSIGNED_SQL_MI \
+    --query 'clientId' \
+    --output tsv
+)

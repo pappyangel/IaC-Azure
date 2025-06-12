@@ -1,0 +1,15 @@
+#!/bin/bash
+
+echo "Creating Private DNS Zone -" $(date +"%I:%M:%S:%3N %p")
+az network private-dns zone create -g $RG_NAME \
+   -n $HUBSPOKE1_PRIVATE_DNS_ZONE >> $BATCHRUN.txt 2>&1 < /dev/null
+
+echo "Linking Hub VNet to Private DNS Zone -" $(date +"%I:%M:%S:%3N %p")
+az network private-dns link vnet create -g $RG_NAME -n $HUB_DNS_LINK_NAME \
+   -z $HUBSPOKE1_PRIVATE_DNS_ZONE -v $HUB_VNET_NAME -e true >> $BATCHRUN.txt 2>&1 < /dev/null
+
+echo "Linking Spoke 1 VNet to Private DNS Zone -" $(date +"%I:%M:%S:%3N %p")
+az network private-dns link vnet create -g $RG_NAME -n $SPOKE_1_DNS_LINK_NAME \
+   -z $HUBSPOKE1_PRIVATE_DNS_ZONE -v $SPOKE_1_VNET_NAME -e true >> $BATCHRUN.txt 2>&1 < /dev/null
+
+

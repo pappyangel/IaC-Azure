@@ -1,0 +1,20 @@
+curl http://10.2.0.94/weatherforecast
+
+curl http://10.2.0.94/blob/getone
+
+curl http://10.2.0.92/machinename
+
+kubectl get nodes,services
+
+kubectl get pods -n storage
+kubectl logs aks-storage-deployment-6674c598db-b86n6  -n storage
+
+kubectl get service aks-storage-service -n storage
+kubectl get endpoints aks-storage-service -n storage
+
+kubectl get pods --all-namespaces
+
+git config --global user.name "Jim Vacca"
+git config user.name "Jim Vacca"
+git config --global user.email "jamesvac@microsoft.com"
+git config user.email "jamesvac@microsoft.com"

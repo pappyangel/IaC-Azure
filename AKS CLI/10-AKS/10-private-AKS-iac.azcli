@@ -81,6 +81,9 @@ az aks create \
   --assign-kubelet-identity $IDENTITY_ID \
   --generate-ssh-keys 
 
+# NOTE: if planning to use workload identity, you need to add the following flags:
+# --enable-oidc-issuer \
+
 
 # peer the spoke 2 aks vnet with our hub vnet
 az network vnet peering create \

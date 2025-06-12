@@ -1,24 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: aks-storage-deployment
+  name: $DEPLOYMENT_NAME
+  namespace: $NAMESPACE_NAME
   labels:
-    app: aks-storage
+    app: $APP_NAME
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: aks-storage
+      app: $APP_NAME
   template:
     metadata:
       labels:
-        app: aks-storage
+        app: $APP_NAME
     spec:
       containers:
-        - name: aks-storage
-          image: jfvacr.azurecr.io/storage-app-image:latest} # Update with your ACR login server and image tag
+        - name: $CONTAINER_NAME
+          image: jfvacr.azurecr.io/$IMAGE_NAME:$IMAGE_TAG # Update with your ACR login server and image tag
           ports:
-            - containerPort: 8080         
+            - containerPort: 5000         
           resources:
             requests:
               cpu: "100m"

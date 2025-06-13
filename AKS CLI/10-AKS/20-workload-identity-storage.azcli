@@ -90,6 +90,19 @@ az role assignment create \
     --role "Storage Blob Data Contributor" \
     --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$SPOKE_AKS_RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME"
 
+export STORAGE_ACCOUNT_NAME="sa02files"
+export STORAGE_RG_NAME="rg-StorageAccounts"
+az role assignment create \
+    --assignee $USER_ASSIGNED_CLIENT_ID \
+    --role "Storage Blob Data Contributor" \
+    --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$STORAGE_RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME"
+
+az role assignment list \
+  --assignee $USER_ASSIGNED_CLIENT_ID \
+  --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$STORAGE_RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME" \
+  --output table
+
+
 echo $USER_ASSIGNED_PRINCIPAL_ID
 echo $USER_ASSIGNED_CLIENT_ID
 echo $AKS_OIDC_ISSUER

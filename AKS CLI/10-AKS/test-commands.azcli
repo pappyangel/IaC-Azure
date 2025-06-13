@@ -7,6 +7,8 @@ curl http://10.2.0.92/machinename
 kubectl get nodes,services
 
 kubectl get pods -n storage
+kubectl describe pod aks-storage-deployment-6f75bb9cf-d5rkq -n storage
+kubectl logs -f -l app=aks-storage -n storage
 kubectl logs aks-storage-deployment-6674c598db-b86n6  -n storage
 
 kubectl get service aks-storage-service -n storage
@@ -26,5 +28,22 @@ kubectl get pods -n storage -o custom-columns=NAME:.metadata.name,SA:.spec.servi
 kubectl delete deployment aks-storage-deployment -n default
 
 kubectl get pods -n azure-workload-identity-system
+kubectl get pods -n kube-system
+
+az aks show --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME --resource-group $SPOKE_AKS_RG_NAME --query "oidcIssuerProfile.issuerUrl" -o tsv
+
+nslookup spoke2-aks-rg-spoke2-aks-94b957-d18vcyvw.privatelink.eastus2.azmk8s.io 192.168.1.1
+
+sudo apt install bind9-dnsutils
+
+Get-DnsClientServerAddress
+
+kubectl describe sa workload-identity-storage -n storage
+kubectl scale deployment aks-storage-deployment --replicas 1 -n storage
 
 
+
+https://eastus2.oic.prod-aks.azure.com/33824df8-959e-49c3-9d78-a56a9e310102/cfd81191-31ea-4554-b877-c7634a164657/
+https://eastus2.oic.prod-aks.azure.com/33824df8-959e-49c3-9d78-a56a9e310102/cfd81191-31ea-4554-b877-c7634a164657/"
+
+eyJhbGciOiJSUzI1NiIsImtpZCI6Ik5QU1A4cnlOek1UOVRuUFd5WXlVVFFyYWpiMElOMmprTDBkcHdIdU1ZM0kifQ.eyJhdWQiOlsiYXBpOi8vQXp1cmVBRFRva2VuRXhjaGFuZ2UiXSwiZXhwIjoxNzQ5ODM1NTc2LCJpYXQiOjE3NDk4MzE5NzYsImlzcyI6Imh0dHBzOi8vZWFzdHVzMi5vaWMucHJvZC1ha3MuYXp1cmUuY29tLzMzODI0ZGY4LTk1OWUtNDljMy05ZDc4LWE1NmE5ZTMxMDEwMi9jZmQ4MTE5MS0zMWVhLTQ1NTQtYjg3Ny1jNzYzNGExNjQ2NTcvIiwianRpIjoiODIwNWZlMGItMTBmMy00ZjgzLTgxYzQtZmQxYTVhODQxNjFhIiwia3ViZXJuZXRlcy5pbyI6eyJuYW1lc3BhY2UiOiJzdG9yYWdlIiwibm9kZSI6eyJuYW1lIjoiYWtzLW5vZGVwb29sMS0xMjAwMDM5Mi12bXNzMDAwMDBnIiwidWlkIjoiNjNlMzdlMGYtNDk1NC00ZjgxLTgyMzQtNWE2NGZjMzFmM2ZlIn0sInBvZCI6eyJuYW1lIjoiYWtzLXN0b3JhZ2UtZGVwbG95bWVudC02Zjc1YmI5Y2YtZDVya3EiLCJ1aWQiOiI4OTZjNDhiZC0yOTI1LTQxOTktYjE2OS05ZDkwZWU3ZGQ1YTYifSwic2VydmljZWFjY291bnQiOnsibmFtZSI6Indvcmtsb2FkLWlkZW50aXR5LXN0b3JhZ2UiLCJ1aWQiOiJkNjc2MzhkYi02Nzk2LTQ2MDUtYmI4NS05MDAyYTc1ZDlhZmEifX0sIm5iZiI6MTc0OTgzMTk3Niwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50OnN0b3JhZ2U6d29ya2xvYWQtaWRlbnRpdHktc3RvcmFnZSJ9.sO_T7lzaYyXRE9kKgUvTbhaCSd5KZAwmuRT2Oz6ZKqdwtePRB0DT92qtu8Ft_mKjR2bF9pwB6EP8lzuTb6tDAjINy-7QYf2IvUsDskpv6mQ79F7PMJGeoVRn5tL8GfWCv5FikpbIMzPrc5jeE0_CH_b7Av1ESI65Yrkwf69-pvH9r0RW2OsMrDyIS6m10cdyq59jTs-BllHR4cqz-6xC-nGIwI0e0nLNTgWrYXpcNsKElv8BFYUNSW2gV9XWVKnt87OAl4oMD-dIX6HIBSSwHJBsJmIctroZ7obZ9uheCMbJPjerxZLno8rQWDicpu0bMv8QIbohq1wj2zjYNsRju4Mpv_h5b61FM76KNJ9bvwL2ZmtQynmzR6347vGuXXB7cIEiPOVEZLy2SWD59GiO7kaE7M_GDY_hNkNjZL9lqedwXpvrAZlhd15FjzEOKDptyXwX-22JxFn3z_kf1M3ZzyVvyGqqMpNqCKien8l6bXuiuFwkv9p4a6w321N1dgMmRJKfZChNqXDHufiQuFhtmDvcmCXRvgqu7Wy8zKBa7olW_8DcXWiBADdPrYE99r3Pd4P92rnOZPU9ZjfWoajdl5p9iVewZuD6rMdvdgrAVs6gkR1mvBT6N4WbtIx2_1DLjJK7dRUYbpFSvPF2wbcDYpIm6vknho-4XVUE31gZqzc

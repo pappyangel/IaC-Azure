@@ -17,5 +17,12 @@ kubectl get pods --all-namespaces
 kubectl get serviceaccount -n $NAMESPACE_NAME
 kubectl get serviceaccount workload-identity-storage -n storage -o yaml
 
+kubectl rollout restart deployment aks-storage-deployment -n storage
+
+kubectl get serviceaccount workload-identity-storage -n storage -o yaml
+kubectl get pod aks-storage-deployment-6f95667dc8-586tz  -n storage -o jsonpath="{.spec.serviceAccountName}"
+kubectl get pods -n storage -o custom-columns=NAME:.metadata.name,SA:.spec.serviceAccountName
+
+kubectl delete deployment aks-storage-deployment -n default
 
 

@@ -15,6 +15,7 @@ spec:
       labels:
         app: $APP_NAME
     spec:
+      serviceAccountName: $SERVICE_ACCOUNT_NAME 
       containers:
         - name: $CONTAINER_NAME
           image: jfvacr.azurecr.io/$IMAGE_NAME:$IMAGE_TAG # Update with your ACR login server and image tag

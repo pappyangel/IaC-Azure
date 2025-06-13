@@ -103,6 +103,12 @@ az role assignment list \
   --output table
 
 
+az role assignment list \
+  --assignee $USER_ASSIGNED_CLIENT_ID \
+  --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$STORAGE_RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME" \
+  --output table
+
+
 echo $USER_ASSIGNED_PRINCIPAL_ID
 echo $USER_ASSIGNED_CLIENT_ID
 echo $AKS_OIDC_ISSUER

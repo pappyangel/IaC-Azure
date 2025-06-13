@@ -15,6 +15,7 @@ spec:
       labels:
         app: aks-storage
     spec:
+      serviceAccountName: workload-identity-storage 
       containers:
         - name: aks-storage
           image: jfvacr.azurecr.io/wi-storage-image:remote-v1 # Update with your ACR login server and image tag

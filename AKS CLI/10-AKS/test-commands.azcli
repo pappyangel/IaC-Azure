@@ -14,5 +14,8 @@ kubectl get endpoints aks-storage-service -n storage
 
 kubectl get pods --all-namespaces
 
+kubectl get serviceaccount -n $NAMESPACE_NAME
+kubectl get serviceaccount workload-identity-storage -n storage -o yaml
+
 
 

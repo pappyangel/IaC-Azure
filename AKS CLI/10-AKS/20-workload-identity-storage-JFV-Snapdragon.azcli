@@ -85,6 +85,7 @@ az ad sp create --id $USER_ASSIGNED_CLIENT_ID
 az ad sp show --id $USER_ASSIGNED_CLIENT_ID
 
 # add necessary role assignments to the identity
+export STORAGE_ACCOUNT_NAME="sa02files"
 az role assignment create \
     --assignee $USER_ASSIGNED_CLIENT_ID \
     --role "Storage Blob Data Contributor" \
@@ -97,3 +98,8 @@ echo $AKS_OIDC_ISSUER
 az identity create --name test-mi --resource-group $SPOKE_AKS_RG_NAME --location $LOCATION
 az identity show --name test-mi --resource-group $SPOKE_AKS_RG_NAME
 # Try to show or create the service principal for the new identity
+
+az role assignment create \
+  --assignee e59d560c-37d5-49a4-ad65-41c00a13233a \
+  --role "Storage Blob Data Contributor" \
+  --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$SPOKE_AKS_RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME"

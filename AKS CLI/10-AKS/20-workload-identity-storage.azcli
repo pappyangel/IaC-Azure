@@ -44,7 +44,7 @@ export USER_ASSIGNED_PRINCIPAL_ID=$(
 az aks get-credentials --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME --resource-group $SPOKE_AKS_RG_NAME
 # if using wsl, copy the kubeconfig file to the wsl home directory
 # 
-cp -pR /mnt/c/Users/{WIN-USER}/.kube ~/.
+cp -pR /mnt/c/Users/jamesvac/.kube ~/.
 
 kubectl get nodes,services
 
@@ -112,6 +112,7 @@ az role assignment list \
 echo $USER_ASSIGNED_PRINCIPAL_ID
 echo $USER_ASSIGNED_CLIENT_ID
 echo $AKS_OIDC_ISSUER
+echo $SUBSCRIPTION_ID
 
 az identity create --name test-mi --resource-group $SPOKE_AKS_RG_NAME --location $LOCATION
 az identity show --name test-mi --resource-group $SPOKE_AKS_RG_NAME

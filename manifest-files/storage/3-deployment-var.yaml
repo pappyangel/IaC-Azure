@@ -5,6 +5,7 @@ metadata:
   namespace: $NAMESPACE_NAME
   labels:
     app: $APP_NAME
+    azure.workload.identity/use: "true"
 spec:
   replicas: 3
   selector:

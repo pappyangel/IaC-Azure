@@ -25,4 +25,6 @@ kubectl get pods -n storage -o custom-columns=NAME:.metadata.name,SA:.spec.servi
 
 kubectl delete deployment aks-storage-deployment -n default
 
+kubectl get pods -n azure-workload-identity-system
+
 

@@ -56,7 +56,7 @@ export CONTAINER_NAME=$APP_NAME
 export DEPLOYMENT_NAME="$APP_NAME-deployment"
 export SERVICE_NAME="$APP_NAME-service"
 export IMAGE_NAME="wi-storage-image"
-export IMAGE_TAG="remote-v1"
+export IMAGE_TAG="remote-v2"
 
 #preprocessor for manifest files
 # move into the directory where the manifest files are located
@@ -75,6 +75,21 @@ az identity federated-credential create \
     --issuer $AKS_OIDC_ISSUER \
     --subject system:serviceaccount:$NAMESPACE_NAME:$SERVICE_ACCOUNT_NAME \
     --audience api://AzureADTokenExchange
+
+az identity federated-credential create \
+    --name fed-id-2 \
+    --identity-name $USER_ASSIGNED_STORAGE_MI \
+    --resource-group $SPOKE_AKS_RG_NAME \
+    --issuer $AKS_OIDC_ISSUER \
+    --subject system:serviceaccount:$NAMESPACE_NAME:$SERVICE_ACCOUNT_NAME \
+    --audience https://oidc.prod-aks.azure.com/$SPOKE_AKS_PRIVATE_CLUSTER_NAME
+
+# Replace <resource-group> and <aks-cluster-name> with your values
+
+  az identity federated-credential show \
+  --identity-name $USER_ASSIGNED_STORAGE_MI \
+  --resource-group $SPOKE_AKS_RG_NAME \
+  --name fed-id-2
 
 
 # deploy app with workload identity

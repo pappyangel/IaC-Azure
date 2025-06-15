@@ -1,6 +1,6 @@
-curl http://10.2.0.94/weatherforecast
-
-curl http://10.2.0.94/blob/getone
+curl http://10.2.0.94/
+curl http://10.2.0.94/machinename
+curl http://10.2.0.94/getblob
 
 curl http://10.2.0.92/machinename
 

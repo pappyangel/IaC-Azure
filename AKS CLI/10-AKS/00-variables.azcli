@@ -3,6 +3,7 @@
 
 # --- Get Subscription ID ---
 export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+export LOCATION="eastus2"
 
 # confirm from Hub Spoke CLI scripts
 export HUB_RG_NAME="rg-iac-201"

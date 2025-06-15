@@ -15,7 +15,7 @@ export AKS_OIDC_ISSUER=$(
 export SUBSCRIPTION_ID="$(az account show --query id --output tsv)"
 
 # Storage MI
-export USER_ASSIGNED_STORAGE_MI="storage_mi2"
+export USER_ASSIGNED_STORAGE_MI="storage_mi"
 
 az identity create \
   --name $USER_ASSIGNED_STORAGE_MI \
@@ -106,6 +106,12 @@ az role assignment create \
     --assignee $USER_ASSIGNED_CLIENT_ID \
     --role "Storage Blob Data Contributor" \
     --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$STORAGE_RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME"
+
+az role assignment create \
+    --assignee-object-id $USER_ASSIGNED_PRINCIPAL_ID \
+    --role "Storage Blob Data Contributor" \
+    --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$STORAGE_RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME" \
+    --assignee-principal-type ServicePrincipal
 
 
 az role assignment list \

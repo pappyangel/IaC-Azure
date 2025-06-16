@@ -1,0 +1,13 @@
+# Remove all git history and keep only the latest commit
+
+git checkout --orphan HistoryClearBranch      # Create a new orphan branch with no history
+git add -A                              # Stage all files
+git commit -am "Initial commit after history removal"  # Commit all files
+git branch -D main                      # Delete the old main branch
+git branch -m main                      # Rename orphan branch to main
+git push -f origin main                 # Force-push to overwrite remote history
+
+# Clear the reflog and perform garbage collection to remove unreachable commits
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive
+

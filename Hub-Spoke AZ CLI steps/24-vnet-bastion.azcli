@@ -1,0 +1,24 @@
+#!/bin/bash
+
+echo "Creating AzureBastionSubnet in Hub VNet"
+az network vnet subnet create \
+  --resource-group $RG_NAME \
+  --vnet-name $HUB_VNET_NAME \
+  --name AzureBastionSubnet \
+  --address-prefixes 10.0.1.0/27 >> $BATCHRUN.txt 2>&1 < /dev/null
+
+echo "Creating public IP for Bastion"
+az network public-ip create \
+  --resource-group $RG_NAME \
+  --name bastion-pip \
+  --sku Standard \
+  --location $LOCATION >> $BATCHRUN.txt 2>&1 < /dev/null
+
+echo "Creating Bastion Host"
+az network bastion create \
+  --resource-group $RG_NAME \
+  --name bastion-host \
+  --public-ip-address bastion-pip \
+  --vnet-name $HUB_VNET_NAME \
+  --location $LOCATION \
+  --sku Developer >> $BATCHRUN.txt 2>&1 < /dev/null

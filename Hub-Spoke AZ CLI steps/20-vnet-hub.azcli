@@ -1,0 +1,19 @@
+#!/bin/bash
+# shfmt -i 2 -ci -w
+
+echo "Creating Hub VNet"
+az network vnet create \
+  --resource-group $RG_NAME \
+  --name $HUB_VNET_NAME \
+  --address-prefix $HUB_VNET_PREFIX \
+  --subnet-name $HUB_DEFAULT_SUBNET_NAME \
+  --subnet-prefix $HUB_DEFAULT_SUBNET_PREFIX \
+  --output table >> $BATCHRUN.txt 2>&1 < /dev/null
+
+echo "Creating second subnet in Hub VNet"
+az network vnet subnet create \
+  --resource-group $RG_NAME \
+  --vnet-name $HUB_VNET_NAME \
+  --name $HUB_SECOND_SUBNET_NAME \
+  --address-prefix $HUB_SECOND_SUBNET_PREFIX \
+  --output table >> $BATCHRUN.txt 2>&1 < /dev/null

@@ -1,0 +1,117 @@
+# run below command if cluster is not created with OIDC issuer enabled
+az aks update \
+  --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME \
+  --resource-group $SPOKE_AKS_RG_NAME \
+  --enable-oidc-issuer
+
+export AKS_OIDC_ISSUER=$(
+  az aks show \
+    --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME \
+    --resource-group $SPOKE_AKS_RG_NAME \
+    --query "oidcIssuerProfile.issuerUrl" \
+    -o tsv
+)
+
+export SUBSCRIPTION_ID="$(az account show --query id --output tsv)"
+
+# Storage MI
+export USER_ASSIGNED_STORAGE_MI="storage_mi"
+
+az identity create \
+  --name $USER_ASSIGNED_STORAGE_MI \
+  --resource-group $SPOKE_AKS_RG_NAME \
+  --location $LOCATION
+  
+
+export USER_ASSIGNED_CLIENT_ID=$(
+  az identity show \
+    --resource-group $SPOKE_AKS_RG_NAME \
+    --name $USER_ASSIGNED_STORAGE_MI \
+    --query 'clientId' \
+    --output tsv
+)
+
+export USER_ASSIGNED_PRINCIPAL_ID=$(
+  az identity show \
+    --resource-group $SPOKE_AKS_RG_NAME \
+    --name $USER_ASSIGNED_STORAGE_MI \
+    --query principalId \
+    --output tsv
+)
+ 
+
+az aks get-credentials --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME --resource-group $SPOKE_AKS_RG_NAME
+# if using wsl, copy the kubeconfig file to the wsl home directory
+# cp -pR /mnt/c/Users/<username>/.kube ~/.
+
+kubectl get nodes,services
+
+export NAMESPACE_NAME="storage"
+export SERVICE_ACCOUNT_NAME="workload-identity-storage"
+export FEDERATED_IDENTITY_CREDENTIAL_NAME="fed-id-storage"
+export APP_NAME="aks-storage"
+export CONTAINER_NAME=$APP_NAME
+export DEPLOYMENT_NAME="$APP_NAME-deployment"
+export SERVICE_NAME="$APP_NAME-service"
+export IMAGE_NAME="wi-storage-image"
+export IMAGE_TAG="remote-v2"
+
+#preprocessor for manifest files
+# cd into the directory where the manifest files are located
+envsubst < 1-namespace-var.yaml > namespace.yaml
+envsubst < 2-service-account-var.yaml > service-account.yaml
+envsubst < 3-deployment-var.yaml > deployment.yaml
+envsubst < 4-service-var.yaml > service.yaml
+
+kubectl apply -f namespace.yaml 
+kubectl apply -f service-account.yaml
+
+az identity federated-credential create \
+    --name $FEDERATED_IDENTITY_CREDENTIAL_NAME \
+    --identity-name $USER_ASSIGNED_STORAGE_MI \
+    --resource-group $SPOKE_AKS_RG_NAME \
+    --issuer $AKS_OIDC_ISSUER \
+    --subject system:serviceaccount:$NAMESPACE_NAME:$SERVICE_ACCOUNT_NAME \
+    --audience api://AzureADTokenExchange
+
+
+  az identity federated-credential show \
+  --identity-name $USER_ASSIGNED_STORAGE_MI \
+  --resource-group $SPOKE_AKS_RG_NAME \
+  --name $FEDERATED_IDENTITY_CREDENTIAL_NAME
+
+
+# deploy app with workload identity
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+
+# add necessary role assignments to the identity
+export STORAGE_ACCOUNT_NAME="sa02files"
+export STORAGE_RG_NAME="rg-StorageAccounts"
+
+az role assignment create \
+    --assignee $USER_ASSIGNED_CLIENT_ID \
+    --role "Storage Blob Data Contributor" \
+    --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$STORAGE_RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME"
+
+az role assignment create \
+    --assignee-object-id $USER_ASSIGNED_PRINCIPAL_ID \
+    --role "Storage Blob Data Contributor" \
+    --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$STORAGE_RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME" \
+    --assignee-principal-type ServicePrincipal
+
+
+az role assignment list \
+  --assignee $USER_ASSIGNED_CLIENT_ID \
+  --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$STORAGE_RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME" \
+  --output table
+
+echo $USER_ASSIGNED_PRINCIPAL_ID
+echo $USER_ASSIGNED_CLIENT_ID
+echo $AKS_OIDC_ISSUER
+echo $SUBSCRIPTION_ID
+echo $SERVICE_ACCOUNT_NAME
+echo $STORAGE_ACCOUNT_NAME
+echo $STORAGE_RG_NAME
+
+

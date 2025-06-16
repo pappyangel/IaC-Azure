@@ -1,0 +1,45 @@
+curl http://10.2.0.94/
+curl http://10.2.0.94/machinename
+curl http://10.2.0.94/getblob
+
+curl http://10.2.0.92/machinename
+
+# connect to cluster
+az aks get-credentials --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME --resource-group $SPOKE_AKS_RG_NAME
+kubectl config use-context spoke2-aks
+kubectl config use-context aks-private-03
+
+kubectl config current-context
+kubectl config get-contexts
+az aks install-cli
+
+kubectl get nodes,services
+
+kubectl get pods -n storage
+kubectl describe pod aks-storage-deployment-6f75bb9cf-d5rkq -n storage
+kubectl logs -f -l app=aks-storage -n storage
+kubectl logs aks-storage-deployment-6674c598db-b86n6  -n storage
+
+kubectl get service aks-storage-service -n storage
+kubectl get endpoints aks-storage-service -n storage
+
+kubectl get pods --all-namespaces
+
+kubectl get serviceaccount -n $NAMESPACE_NAME
+kubectl get serviceaccount workload-identity-storage -n storage -o yaml
+
+kubectl rollout restart deployment aks-storage-deployment -n storage
+
+kubectl get serviceaccount workload-identity-storage -n storage -o yaml
+kubectl get pod aks-storage-deployment-6f95667dc8-586tz  -n storage -o jsonpath="{.spec.serviceAccountName}"
+kubectl get pods -n storage -o custom-columns=NAME:.metadata.name,SA:.spec.serviceAccountName
+
+kubectl delete deployment aks-storage-deployment -n default
+
+kubectl get pods -n azure-workload-identity-system
+kubectl get pods -n kube-system
+
+az aks show --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME --resource-group $SPOKE_AKS_RG_NAME --query "oidcIssuerProfile.issuerUrl" -o tsv
+
+kubectl describe sa workload-identity-storage -n storage
+kubectl scale deployment aks-storage-deployment --replicas 1 -n storage

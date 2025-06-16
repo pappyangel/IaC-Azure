@@ -1,0 +1,81 @@
+az vm show --resource-group rg-vnet-peering --name vm-1 --output table 
+
+az vm show --resource-group rg-vnet-peering --name vm-1 --output json
+
+az vm get-instance-view --resource-group rg-vnet-peering --name vm-1 --output table
+
+# Verify creation was successful
+echo "Verifying resource group creation..."
+az group show --name $RG_NAME --output table | tee mylog.txt
+
+az group show --name $RG_NAME --output table > mylog.txt 2>&1 < /dev/null
+
+# Delete the resource group
+az group delete --name $RG_NAME --yes --verbose
+
+--debug
+--verbose
+
+# Verification
+az network vnet show --resource-group $RG_NAME --name $HUB_VNET_NAME --query "{Name:name, ResourceGroup:resourceGroup, AddressSpace:addressSpace.addressPrefixes, Subnets:subnets[].name}" --output table
+az network vnet subnet list --resource-group $RG_NAME --vnet-name $HUB_VNET_NAME --output table
+
+export HUB_TO_SPOKE1_PEERING_NAME="hub-to-spoke1-peering"
+export SPOKE1_TO_HUB_PEERING_NAME="spoke1-to-hub-peering"
+
+echo "HUB_TO_SPOKE1_PEERING_NAME: $HUB_TO_SPOKE1_PEERING_NAME"
+echo "SPOKE1_TO_HUB_PEERING_NAME: $SPOKE1_TO_HUB_PEERING_NAME"
+
+az network vnet-gateway show --resource-group $RG_NAME --name $VPN_GATEWAY_NAME
+
+echo $VPN_GATEWAY_NAME
+
+
+dog='[\"$P2S_CLIENT_ADDRESS_POOL\"]'
+echo $dog
+
+cat=[\"$P2S_CLIENT_ADDRESS_POOL\"]
+echo $cat
+
+az network private-dns zone list -g $RG_NAME
+
+az network bastion show \
+  --resource-group "rg-iac-201" \
+  --name "bastion-host" \
+  --output jsonc
+
+az network bastion show \
+  --resource-group "rg-iac-201" \
+  --name "spoke-1-vnet-bastion" \
+  --output table
+
+# Delete existing Bastion and rebuild as Developer SKU
+az network bastion delete \
+  --resource-group "rg-iac-201" \
+  --name "bastion-host"
+
+
+az network bastion show \
+  --resource-group "rg-iac-201" \
+  --name "bastion-host" \
+  --query "sku.name" \
+  --output tsv
+
+az network bastion show \
+  --resource-group "rg-iac-201" \
+  --name "spoke-1-vnet-bastion" \
+  --query "sku.name" \
+  --output tsv
+
+  #### resolver commands
+  export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+  az dns-resolver show --name hub-vnet-dns-resolver --resource-group rg-iac-201 --subscription $SUBSCRIPTION_ID
+  
+
+echo "Verifying inbound endpoint IP assignment..."
+az dns-resolver inbound-endpoint show \
+  --dns-resolver-name "hub-vnet-dns-resolver" \
+  --name "hub-inbound-endpoint" \
+  --resource-group $RG_NAME \
+  --query "ipConfigurations[0].privateIpAddress" \
+  --output tsv

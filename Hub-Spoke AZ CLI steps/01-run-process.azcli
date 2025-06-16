@@ -1,0 +1,23 @@
+#!/bin/bash
+# load variables
+
+/workspaces/IaC-Azure/AZ CLI steps/00-variables.azcli
+
+source ./"Hub-Spoke AZ CLI steps/00-variables.azcli"
+source ./00-variables.azcli
+
+source 10-rg-create.azcli
+
+source 20-vnet-hub.azcli
+source 22-vnet-vm.azcli 
+source 24-vnet-bastion.azcli 
+
+source 30-vnet-spoke-1.azcli 
+source 32-vnet-vm.azcli 
+
+source 40-vnet-peering.azcli
+
+source 50-p2s-vpn-gw.azcli
+source 52-peering-updates-for-vpngw.azcli
+
+source 60-private-dns.azcli

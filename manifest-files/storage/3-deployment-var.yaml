@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $DEPLOYMENT_NAME
+  namespace: $NAMESPACE_NAME
+  labels:
+    app: $APP_NAME
+    azure.workload.identity/use: "true"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: $APP_NAME
+  template:
+    metadata:
+      labels:
+        app: $APP_NAME
+    spec:
+      serviceAccountName: $SERVICE_ACCOUNT_NAME 
+      containers:
+        - name: $CONTAINER_NAME
+          image: jfvacr.azurecr.io/$IMAGE_NAME:$IMAGE_TAG # Update with your ACR login server and image tag
+          ports:
+            - containerPort: 5000         
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

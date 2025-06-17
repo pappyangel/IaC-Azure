@@ -3,13 +3,8 @@
 
 echo "Creating Variables START"
 
-export BATCHRUN="201"
-export RG_NAME="rg-iac-$BATCHRUN"
-export LOCATION="eastus2"
-# --- Get Subscription ID ---
-export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+source ./00-batch-run-vars.azcli
 
-export HUB_VNET_NAME="hub-vnet"
 export HUB_VNET_PREFIX="10.0.0.0/16"
 export HUB_DEFAULT_SUBNET_NAME="hub-subnet"
 export HUB_DEFAULT_SUBNET_PREFIX="10.0.0.0/24"

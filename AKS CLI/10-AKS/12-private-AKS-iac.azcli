@@ -1,16 +1,16 @@
 #!/bin/bash
 
-# --- Create Resource Group (idempotent) ---
+# --- Create Resource Group ---
 az group create --name $SPOKE_AKS_RG_NAME --location $LOCATION 
 
-# --- Create VNet (idempotent) ---
+# --- Create VNet ---
 az network vnet create \
   --resource-group $SPOKE_AKS_RG_NAME \
   --name $SPOKE_AKS_VNET_NAME \
   --address-prefixes $SPOKE_VNET_ADDRESS_PREFIX \
   --location $LOCATION 
 
-# --- Create AKS Subnet (idempotent) ---
+# --- Create AKS Subnet ---
 az network vnet subnet create \
   --resource-group $SPOKE_AKS_RG_NAME \
   --vnet-name $SPOKE_AKS_VNET_NAME \
@@ -24,19 +24,18 @@ export AKS_SUBNET_ID=$(az network vnet subnet show \
   --name $AKS_SUBNET_NAME \
   --query id -o tsv)
 
+echo "AKS Subnet ID: $AKS_SUBNET_ID"
+
 # --- Check Private DNS Zone ---
 echo "Checking Private DNS Zone..."
 export PRIVATE_DNS_ZONE_ID=$(az network private-dns zone show \
   --resource-group $DNS_ZONE_RG_NAME \
   --name $PRIVATE_ZONE_NAME \
   --query id -o tsv 2>/dev/null)
-if [ -z "$PRIVATE_DNS_ZONE_ID" ]; then
-  echo "Error: Private DNS Zone '$PRIVATE_ZONE_NAME' not found in RG '$DNS_ZONE_RG_NAME'."
-  exit 1
-fi
+
 echo "Private DNS Zone ID: $PRIVATE_DNS_ZONE_ID"
 
-# --- Create User-Assigned Managed Identity (idempotent) ---
+# --- Create User-Assigned Managed Identity ---
 az identity create \
   --resource-group $SPOKE_AKS_RG_NAME \
   --name $AKS_MANAGEDIDENTITY_NAME \
@@ -47,10 +46,14 @@ export IDENTITY_PRINCIPAL_ID=$(az identity show \
   --name $AKS_MANAGEDIDENTITY_NAME \
   --query principalId -o tsv)
 
+echo "Managed Identity Principal ID: $IDENTITY_PRINCIPAL_ID"
+
 export IDENTITY_ID=$(az identity show \
   --resource-group $SPOKE_AKS_RG_NAME \
   --name $AKS_MANAGEDIDENTITY_NAME \
   --query id -o tsv)
+
+echo "Managed Identity ID: $IDENTITY_ID"
 
 # --- Assign 'Private DNS Zone Contributor' Role (idempotent) ---
 az role assignment create \
@@ -83,28 +86,30 @@ az aks create \
 
 # NOTE: if planning to use workload identity, you need to add the following flags:
 # --enable-oidc-issuer \
+# --enable-workload-identity \
 
 
-# peer the spoke 2 aks vnet with our hub vnet
+export dog=spoke${SPOKE_ID}-aks-to-hub-peering 
+
+# peer the spoke aks vnet with our hub vnet
 az network vnet peering create \
   --resource-group $SPOKE_AKS_RG_NAME \
-  --name spoke2-aks-to-hub-peering \
+  --name spoke${SPOKE_ID}-aks-to-hub-peering \
   --vnet-name $SPOKE_AKS_VNET_NAME \
   --remote-vnet "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$HUB_RG_NAME/providers/Microsoft.Network/virtualNetworks/$HUB_VNET_NAME" \
   --allow-vnet-access \
   --allow-forwarded-traffic \
   --use-remote-gateways true
 
-# peer the hub vnet to the spoke 2 aks vnet
+# peer the hub vnet to the spoke aks vnet
 az network vnet peering create \
   --resource-group $HUB_RG_NAME \
-  --name hub-to-spoke2-aks-peering \
+  --name hub-to-spoke${SPOKE_ID}-aks-peering \
   --vnet-name  $HUB_VNET_NAME \
   --remote-vnet "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$SPOKE_AKS_RG_NAME/providers/Microsoft.Network/virtualNetworks/$SPOKE_AKS_VNET_NAME" \
   --allow-vnet-access \
   --allow-forwarded-traffic \
   --allow-gateway-transit true
-
 
 # --- Assign 'Network Contributor' Role on Hub VNet ---
 az role assignment create \
@@ -112,14 +117,15 @@ az role assignment create \
   --role "Network Contributor" \
   --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$HUB_RG_NAME/providers/Microsoft.Network/virtualNetworks/$HUB_VNET_NAME"
 
-# --- Create Private DNS Zone Virtual Network Link to Hub VNet ---
+# --- Create Private DNS Zone Virtual Network Link to Spoke-ID VNet ---
 az network private-dns link vnet create \
   --resource-group $DNS_ZONE_RG_NAME \
-  --name vnl-hub-regional-dns \
+  --name vnl-spoke${SPOKE_ID}-regional-dns \
   --zone-name $PRIVATE_ZONE_NAME \
-  --virtual-network "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$HUB_RG_NAME/providers/Microsoft.Network/virtualNetworks/$HUB_VNET_NAME" \
+  --virtual-network "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$SPOKE_AKS_RG_NAME/providers/Microsoft.Network/virtualNetworks/$SPOKE_AKS_VNET_NAME" \
   --registration-enabled false
 
+# This is an optional line.  It shows how to add an A record.  We did this for a test App that may no longer exist.
 az network private-dns record-set a add-record \
   --resource-group $DNS_ZONE_RG_NAME \
   --zone-name $PRIVATE_ZONE_NAME \

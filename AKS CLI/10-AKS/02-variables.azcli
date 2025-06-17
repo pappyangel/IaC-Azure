@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# WARNING these variables come from the hub/spoke IaC scripts - check for accuracy    
+source ../../"Hub-Spoke AZ CLI steps"/00-batch-run-vars.azcli
+echo $BATCHRUN
+export HUB_RG_NAME=$RG_NAME
+echo $HUB_RG_NAME
+
 # --- Get Subscription ID ---
 export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 export LOCATION="eastus2"

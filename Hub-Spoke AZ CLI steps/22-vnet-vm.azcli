@@ -2,7 +2,7 @@
 
 echo "Creating VM in Hub VNet"
 az vm create \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --name $VM_HUB_NAME \
   --image $IMAGE \
   --vnet-name $HUB_VNET_NAME \

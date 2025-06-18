@@ -2,7 +2,7 @@
 
 echo "Creating Spoke 1 VNet"
 az network vnet create \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --name $SPOKE_1_VNET_NAME \
   --address-prefix $SPOKE_1_VNET_PREFIX \
   --subnet-name $SPOKE_1_DEFAULT_SUBNET_NAME \

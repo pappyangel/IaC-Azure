@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Creating resource group"
-az group create --name $RG_NAME --location $LOCATION --output table >> $BATCHRUN.txt 2>&1 < /dev/null
+az group create --name $HUB_RG_NAME --location $LOCATION --output table >> $BATCHRUN.txt 2>&1 < /dev/null
 
 
 

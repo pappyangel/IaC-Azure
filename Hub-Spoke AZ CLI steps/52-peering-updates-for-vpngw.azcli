@@ -1,13 +1,13 @@
 # Update Hub-to-Spoke peering to allow gateway transit
 az network vnet peering update \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --vnet-name $HUB_VNET_NAME \
   --name $HUB_TO_SPOKE_1_PEERING_NAME \
   --set allowGatewayTransit=true >> $BATCHRUN.txt 2>&1 < /dev/null
 
 # Update Spoke-to-Hub peering to use remote gateways
 az network vnet peering update \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --vnet-name $SPOKE_1_VNET_NAME \
   --name $SPOKE1_TO_HUB_PEERING_NAME \
   --set useRemoteGateways=true >> $BATCHRUN.txt 2>&1 < /dev/null

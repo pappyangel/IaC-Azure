@@ -2,14 +2,14 @@
 # 1. Create a public IP address for the VPN gateway
 echo "Creating public IP for VPN gateway"
 az network public-ip create \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --name $VPN_PIP_NAME \
   --allocation-method Static >> $BATCHRUN.txt 2>&1 < /dev/null
 
 # 2. Create the VPN gateway subnet in the Hub VNet
 echo "Creating GatewaySubnet in Hub VNet"
 az network vnet subnet create \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --vnet-name $HUB_VNET_NAME \
   --name GatewaySubnet \
   --address-prefixes $GATEWAY_SUBNET_PREFIX >> $BATCHRUN.txt 2>&1 < /dev/null
@@ -17,7 +17,7 @@ az network vnet subnet create \
 # 3. Create the virtual network gateway (VPN gateway) - may take 45 minutes
 echo "Creating VPN gateway  45 min"
 az network vnet-gateway create \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --name $VPN_GATEWAY_NAME \
   --public-ip-address $VPN_PIP_NAME \
   --vnet $HUB_VNET_NAME \
@@ -32,7 +32,7 @@ echo "Configuring Point-to-Site VPN with AAD authentication"
 # vpn_authentication_types array of strings that includes with AAD
 # aad_tenant string with AAD tenant URI
 az network vnet-gateway update \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --name $VPN_GATEWAY_NAME \
   --set vpn_client_configuration.vpn_client_address_pool='{"address_prefixes": ["'"$P2S_CLIENT_ADDRESS_POOL"'"]}' \
         vpn_client_configuration.vpn_client_protocols='["OpenVPN"]' \

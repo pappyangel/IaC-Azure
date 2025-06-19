@@ -4,16 +4,10 @@
 source ../../"Hub-Spoke AZ CLI steps"/00-batch-run-vars.azcli
 echo $BATCHRUN
 
-# --- Get Subscription ID ---
-export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-export LOCATION="eastus2"
+# --- Set Spoke ID ---
 export SPOKE_ID="2" # this is important, change it to 1, 2, 3, etc. for each spoke
 
-# confirm from Hub Spoke CLI scripts
-export HUB_RG_NAME="rg-iac-201"
-export HUB_VNET_NAME="hub-vnet"
-
-export LOCATION="eastus2"
+# --- Spoke Variables ---
 export SPOKE_AKS_RG_NAME="rg-spoke${SPOKE_ID}-aks"  
 export DNS_ZONE_RG_NAME="rg-regional-dns-zones"
 
@@ -28,8 +22,8 @@ export SPOKE_VNET_ADDRESS_PREFIX="10.${SPOKE_ID}.0.0/16"
 export SPOKE_AKS_SUBNET_PREFIX="10.${SPOKE_ID}.0.0/24" 
 
 # service refers to the the control plane API server
-export SPOKE_AKS_SERVICE_CIDR="10.100.0.0/16"
-export SPOKE_AKS_DNS_SERVICE_IP="10.100.0.10"
+export SPOKE_AKS_SERVICE_CIDR="10.${SPOKE_ID}00.0.0/16"
+export SPOKE_AKS_DNS_SERVICE_IP="10.${SPOKE_ID}00.0.10"
 
 # echo for testing
 echo $SPOKE_ID

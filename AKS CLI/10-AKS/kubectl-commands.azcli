@@ -1,6 +1,6 @@
-curl http://10.2.0.94/
-curl http://10.2.0.94/machinename
-curl http://10.2.0.94/getblob
+curl http://10.3.0.92/
+curl http://10.3.0.92/machinename
+curl http://10.3.0.92/getblob
 
 curl http://10.2.0.92/machinename
 
@@ -14,11 +14,18 @@ kubectl config get-contexts
 az aks install-cli
 
 kubectl get nodes,services
+kubectl get pods,services
 
+az aks nodepool list \
+    --resource-group $SPOKE_AKS_RG_NAME \
+    --cluster-name $SPOKE_AKS_PRIVATE_CLUSTER_NAME \
+    --query "[].name" \
+    -o tsv
+  
 kubectl get pods -n storage
 kubectl describe pod aks-storage-deployment-6f75bb9cf-d5rkq -n storage
 kubectl logs -f -l app=aks-storage -n storage
-kubectl logs aks-storage-deployment-6674c598db-b86n6  -n storage
+kubectl logs aks-storage-deployment-54465b546f-88np9  -n storage
 
 kubectl get service aks-storage-service -n storage
 kubectl get endpoints aks-storage-service -n storage

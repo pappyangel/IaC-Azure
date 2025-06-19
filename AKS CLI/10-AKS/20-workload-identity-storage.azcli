@@ -1,8 +1,10 @@
-# run below command if cluster is not created with OIDC issuer enabled
+# run below command if cluster is not created with OIDC issuer enabled & Workload Identity enabled
 az aks update \
   --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME \
   --resource-group $SPOKE_AKS_RG_NAME \
-  --enable-oidc-issuer
+  --enable-oidc-issuer \
+  --enable-workload-identity
+
 
 export AKS_OIDC_ISSUER=$(
   az aks show \
@@ -11,8 +13,7 @@ export AKS_OIDC_ISSUER=$(
     --query "oidcIssuerProfile.issuerUrl" \
     -o tsv
 )
-
-export SUBSCRIPTION_ID="$(az account show --query id --output tsv)"
+echo "AKS OIDC Issuer: $AKS_OIDC_ISSUER"
 
 # Storage MI
 export USER_ASSIGNED_STORAGE_MI="storage_mi"
@@ -31,6 +32,8 @@ export USER_ASSIGNED_CLIENT_ID=$(
     --output tsv
 )
 
+echo "User Assigned Storage MI Client ID: $USER_ASSIGNED_CLIENT_ID"
+
 export USER_ASSIGNED_PRINCIPAL_ID=$(
   az identity show \
     --resource-group $SPOKE_AKS_RG_NAME \
@@ -39,10 +42,7 @@ export USER_ASSIGNED_PRINCIPAL_ID=$(
     --output tsv
 )
  
-
 az aks get-credentials --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME --resource-group $SPOKE_AKS_RG_NAME
-# if using wsl, copy the kubeconfig file to the wsl home directory
-# cp -pR /mnt/c/Users/<username>/.kube ~/.
 
 kubectl get nodes,services
 
@@ -74,12 +74,10 @@ az identity federated-credential create \
     --subject system:serviceaccount:$NAMESPACE_NAME:$SERVICE_ACCOUNT_NAME \
     --audience api://AzureADTokenExchange
 
-
   az identity federated-credential show \
   --identity-name $USER_ASSIGNED_STORAGE_MI \
   --resource-group $SPOKE_AKS_RG_NAME \
   --name $FEDERATED_IDENTITY_CREDENTIAL_NAME
-
 
 # deploy app with workload identity
 kubectl apply -f deployment.yaml

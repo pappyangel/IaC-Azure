@@ -4,8 +4,7 @@ metadata:
   name: $DEPLOYMENT_NAME
   namespace: $NAMESPACE_NAME
   labels:
-    app: $APP_NAME
-    azure.workload.identity/use: "true"
+    app: $APP_NAME    
 spec:
   replicas: 3
   selector:
@@ -15,6 +14,7 @@ spec:
     metadata:
       labels:
         app: $APP_NAME
+        azure.workload.identity/use: "true"
     spec:
       serviceAccountName: $SERVICE_ACCOUNT_NAME 
       containers:

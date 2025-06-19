@@ -54,6 +54,22 @@ export IDENTITY_ID=$(az identity show \
 
 echo "Managed Identity ID: $IDENTITY_ID"
 
+KUBELET_IDENTITY_CLIENT_ID=$(az aks show \
+  --resource-group $SPOKE_AKS_RG_NAME \
+  --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME \
+  --query "identityProfile.kubeletidentity.clientId" \
+  --output tsv)
+echo "Kubelet Identity Client ID: $KUBELET_IDENTITY_CLIENT_ID"
+
+# need ACR vars from the variables script in ACR folder
+export ACR_RESOURCE_GROUP_NAME="jfv-rg-acr"
+export ACR_NAME="jfvacr"
+
+az role assignment create --assignee $KUBELET_IDENTITY_CLIENT_ID \
+   --role AcrPull \
+   --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$ACR_RESOURCE_GROUP_NAME/providers/Microsoft.ContainerRegistry/registries/$ACR_NAME
+
+
 # --- Assign 'Private DNS Zone Contributor' Role (idempotent) ---
 az role assignment create \
   --assignee $IDENTITY_PRINCIPAL_ID \

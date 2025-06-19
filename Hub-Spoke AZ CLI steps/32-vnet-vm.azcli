@@ -2,7 +2,7 @@
 
 echo "Creating VM in Spoke VNet"
 az vm create \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --name $VM_SPOKE_1_NAME \
   --image $IMAGE \
   --vnet-name $SPOKE_1_VNET_NAME \

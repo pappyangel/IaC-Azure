@@ -5,15 +5,15 @@
 echo "Creating DNS Private Resolver..."
 az dns-resolver create \
   --name "hub-vnet-dns-resolver" \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --location $LOCATION \
-  --id "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RG_NAME/providers/Microsoft.Network/virtualNetworks/$HUB_VNET_NAME"
+  --id "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$HUB_RG_NAME/providers/Microsoft.Network/virtualNetworks/$HUB_VNET_NAME"
 
 
 # --- Create dedicated subnet for DNS Private Resolver Inbound Endpoint (Required) ---
 echo "Creating dedicated subnet for DNS Private Resolver Inbound Endpoint..."
 az network vnet subnet create \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --vnet-name $HUB_VNET_NAME \
   --name "dns-resolver-inbound-subnet" \
   --address-prefixes "10.0.3.0/28" \
@@ -24,16 +24,16 @@ echo "Creating DNS Private Resolver Inbound Endpoint with dynamic IP..."
 az dns-resolver inbound-endpoint create \
   --dns-resolver-name "hub-vnet-dns-resolver" \
   --name "inbound-endpoint" \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --location $LOCATION \
-  --ip-configurations '[{"id":"/subscriptions/'$SUBSCRIPTION_ID'/resourceGroups/'$RG_NAME'/providers/Microsoft.Network/virtualNetworks/'$HUB_VNET_NAME'/subnets/dns-resolver-inbound-subnet","privateIpAllocationMethod":"Dynamic"}]'
+  --ip-configurations '[{"id":"/subscriptions/'$SUBSCRIPTION_ID'/resourceGroups/'$HUB_RG_NAME'/providers/Microsoft.Network/virtualNetworks/'$HUB_VNET_NAME'/subnets/dns-resolver-inbound-subnet","privateIpAllocationMethod":"Dynamic"}]'
 
 # --- Extract the dynamically assigned IP address ---
 echo "Extracting DNS Private Resolver IP address..."
 DNS_RESOLVER_IP=$(az dns-resolver inbound-endpoint show \
   --dns-resolver-name "hub-vnet-dns-resolver" \
   --name "inbound-endpoint" \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --query "ipConfigurations[0].privateIpAddress" \
   --output tsv)
 
@@ -42,7 +42,7 @@ echo "DNS Private Resolver assigned IP: $DNS_RESOLVER_IP"
 # --- Configure Hub VNet to use the DNS Private Resolver ---
 echo "Configuring Hub VNet to use DNS Private Resolver as custom DNS server..."
 az network vnet update \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --name $HUB_VNET_NAME \
   --dns-servers "$DNS_RESOLVER_IP"
 
@@ -52,7 +52,7 @@ az network vnet update \
 # # --- Create dedicated subnet for DNS Private Resolver Outbound Endpoint (Optional) ---
 # echo "Creating dedicated subnet for DNS Private Resolver Outbound Endpoint..."
 # az network vnet subnet create \
-#   --resource-group $RG_NAME \
+#   --resource-group $HUB_RG_NAME \
 #   --vnet-name $HUB_VNET_NAME \
 #   --name "subnet-dns-resolver-outbound" \
 #   --address-prefixes "10.0.3.16/28" \
@@ -63,9 +63,9 @@ az network vnet update \
 # az dns-resolver outbound-endpoint create \
 #   --dns-resolver-name "hub-vnet-dns-resolver" \
 #   --name "outbound-endpoint" \
-#   --resource-group $RG_NAME \
+#   --resource-group $HUB_RG_NAME \
 #   --location $LOCATION \
-#   --subnet "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RG_NAME/providers/Microsoft.Network/virtualNetworks/$HUB_VNET_NAME/subnets/subnet-dns-resolver-outbound"
+#   --subnet "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$HUB_RG_NAME/providers/Microsoft.Network/virtualNetworks/$HUB_VNET_NAME/subnets/subnet-dns-resolver-outbound"
 
 
 

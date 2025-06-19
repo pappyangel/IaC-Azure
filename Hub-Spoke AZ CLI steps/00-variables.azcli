@@ -45,7 +45,7 @@ export SPOKE_1_DNS_LINK_NAME="vnl-spoke-1"
 echo "Creating Variables END"
 
 echo "BATCHRUN=$BATCHRUN"
-echo "RG_NAME=$RG_NAME"
+echo "HUB_RG_NAME=$HUB_RG_NAME"
 echo "LOCATION=$LOCATION"
 echo "HUB_VNET_NAME=$HUB_VNET_NAME"
 echo "HUB_VNET_PREFIX=$HUB_VNET_PREFIX"

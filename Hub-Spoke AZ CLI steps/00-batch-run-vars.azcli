@@ -2,5 +2,5 @@ export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 export LOCATION="eastus2"
 
 export BATCHRUN="201"
-export RG_NAME="rg-iac-$BATCHRUN"
+export HUB_RG_NAME="rg-iac-$BATCHRUN"
 export HUB_VNET_NAME="hub-vnet"

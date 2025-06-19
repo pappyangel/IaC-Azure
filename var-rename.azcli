@@ -1,0 +1,4 @@
+grep -rw RG_NAME .
+
+# This replaces only HUB_RG_NAME when it appears as a whole word
+find . -type f -name "*.azcli" -exec sed -i 's/\bRG_NAME\b/HUB_RG_NAME/g' {} +

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 az network private-dns record-set a add-record \
-  --resource-group $RG_NAME \
+  --resource-group $HUB_RG_NAME \
   --zone-name private.hubspoke1.com \
   --record-set-name aks-api \
   --ipv4-address 10.224.0.8

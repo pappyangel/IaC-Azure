@@ -64,7 +64,7 @@ az role assignment create \
 az role assignment create \
   --assignee $IDENTITY_PRINCIPAL_ID \
   --role "Network Contributor" \
-  --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$SPOKE_AKS_RG_NAME/providers/Microsoft.Network/virtualNetworks/$SPOKE_AKS_VNET_NAME"   
+  --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$SPOKE_AKS_RG_NAME/providers/Microsoft.Network/virtualNetworks/$SPOKE_AKS_VNET_NAME"
 
 # --- Create Private AKS Cluster ---
 az aks create \
@@ -81,7 +81,7 @@ az aks create \
   --dns-service-ip $SPOKE_AKS_DNS_SERVICE_IP \
   --assign-identity $IDENTITY_ID \
   --assign-kubelet-identity $IDENTITY_ID \
-  --generate-ssh-keys 
+  --generate-ssh-keys
 
 # NOTE: if planning to use workload identity, you need to add the following flags:
 # --enable-oidc-issuer \
@@ -114,18 +114,20 @@ az role assignment create \
   --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$HUB_RG_NAME/providers/Microsoft.Network/virtualNetworks/$HUB_VNET_NAME"
 
 # --- Create Private DNS Zone Virtual Network Link (VNL) to Spoke-ID VNet ---
-az network private-dns link vnet create \
-  --resource-group $DNS_ZONE_RG_NAME \
-  --name vnl-spoke${SPOKE_ID}-regional-dns \
-  --zone-name $PRIVATE_ZONE_NAME \
-  --virtual-network "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$SPOKE_AKS_RG_NAME/providers/Microsoft.Network/virtualNetworks/$SPOKE_AKS_VNET_NAME" \
-  --registration-enabled false
+# not needed if created during cluster create: --private-dns-zone $PRIVATE_DNS_ZONE_ID
+# az network private-dns link vnet create \
+#   --resource-group $DNS_ZONE_RG_NAME \
+#   --name vnl-spoke${SPOKE_ID}-regional-dns \
+#   --zone-name $PRIVATE_ZONE_NAME \
+#   --virtual-network "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$SPOKE_AKS_RG_NAME/providers/Microsoft.Network/virtualNetworks/$SPOKE_AKS_VNET_NAME" \
+#   --registration-enabled false
 
 # This is an optional line.  It shows how to add an A record.  We did this for a test App that may no longer exist.
-az network private-dns record-set a add-record \
-  --resource-group $DNS_ZONE_RG_NAME \
-  --zone-name $PRIVATE_ZONE_NAME \
-  --record-set-name aks-api \
-  --ipv4-address 10.2.0.92
+# requires corresponding yaml files
+# az network private-dns record-set a add-record \
+#   --resource-group $DNS_ZONE_RG_NAME \
+#   --zone-name $PRIVATE_ZONE_NAME \
+#   --record-set-name aks-api \
+#   --ipv4-address 10.2.0.92 # update accordingly, spoke-id
 
 # End of script finished

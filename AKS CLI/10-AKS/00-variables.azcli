@@ -5,7 +5,7 @@ source ../../"Hub-Spoke AZ CLI steps"/00-batch-run-vars.azcli
 echo $BATCHRUN
 
 # --- Set Spoke ID ---
-export SPOKE_ID="2" # this is important, change it to 1, 2, 3, etc. for each spoke
+export SPOKE_ID="3" # this is important, change it to 1, 2, 3, etc. for each spoke
 
 # --- Spoke Variables ---
 export SPOKE_AKS_RG_NAME="rg-spoke${SPOKE_ID}-aks"  
@@ -22,8 +22,8 @@ export SPOKE_VNET_ADDRESS_PREFIX="10.${SPOKE_ID}.0.0/16"
 export SPOKE_AKS_SUBNET_PREFIX="10.${SPOKE_ID}.0.0/24" 
 
 # service refers to the the control plane API server
-export SPOKE_AKS_SERVICE_CIDR="10.${SPOKE_ID}00.0.0/16"
-export SPOKE_AKS_DNS_SERVICE_IP="10.${SPOKE_ID}00.0.10"
+export SPOKE_AKS_SERVICE_CIDR="10.1${SPOKE_ID}0.0.0/16"
+export SPOKE_AKS_DNS_SERVICE_IP="10.1${SPOKE_ID}0.0.10"
 
 # echo for testing
 echo $SPOKE_ID
@@ -33,3 +33,5 @@ echo $SPOKE_AKS_VNET_NAME
 echo $AKS_SUBNET_NAME
 echo $SPOKE_VNET_ADDRESS_PREFIX
 echo $SPOKE_AKS_SUBNET_PREFIX
+echo $SPOKE_AKS_SERVICE_CIDR
+echo $SPOKE_AKS_DNS_SERVICE_IP

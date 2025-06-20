@@ -21,7 +21,7 @@ spec:
         - name: $CONTAINER_NAME
           image: jfvacr.azurecr.io/$IMAGE_NAME:$IMAGE_TAG # Update with your ACR login server and image tag
           ports:
-            - containerPort: 5050         
+            - containerPort: 5000         
           resources:
             requests:
               cpu: "100m"

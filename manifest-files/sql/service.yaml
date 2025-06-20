@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: aks-storage-service
-  namespace: storage
+  name: aks-sql-service
+  namespace: sql
   annotations:
     service.beta.kubernetes.io/azure-load-balancer-internal: "true"
 spec:
   type: LoadBalancer
   selector:
-    app: aks-storage
+    app: aks-sql
   ports:
     - protocol: TCP
       port: 80

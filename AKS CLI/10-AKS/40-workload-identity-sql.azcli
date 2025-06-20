@@ -102,3 +102,5 @@ az network private-dns record-set a add-record \
   --record-set-name $APP_NAME \
   --ipv4-address $APP_EXTERNAL_IP
   
+
+  echo $APP_NAME

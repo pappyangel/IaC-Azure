@@ -1,6 +1,10 @@
 curl http://10.3.0.92/
 curl http://10.3.0.92/machinename
 curl http://10.3.0.92/getblob
+curl http://aks-storage.privatelink.eastus2.azmk8s.io/getblob
+curl http://aks-storage.privatelink.eastus2.azmk8s.io/
+
+
 
 curl http://10.2.0.92/machinename
 
@@ -15,6 +19,7 @@ az aks install-cli
 
 kubectl get nodes,services
 kubectl get pods,services
+kubectl get services -n storage
 
 az aks nodepool list \
     --resource-group $SPOKE_AKS_RG_NAME \

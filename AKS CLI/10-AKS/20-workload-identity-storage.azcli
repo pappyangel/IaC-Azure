@@ -5,7 +5,6 @@ az aks update \
   --enable-oidc-issuer \
   --enable-workload-identity
 
-
 export AKS_OIDC_ISSUER=$(
   az aks show \
     --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME \
@@ -21,8 +20,7 @@ export USER_ASSIGNED_STORAGE_MI="storage_mi"
 az identity create \
   --name $USER_ASSIGNED_STORAGE_MI \
   --resource-group $SPOKE_AKS_RG_NAME \
-  --location $LOCATION
-  
+  --location $LOCATION  
 
 export USER_ASSIGNED_CLIENT_ID=$(
   az identity show \
@@ -85,31 +83,20 @@ kubectl apply -f service.yaml
 
 # add necessary role assignments to the identity
 export STORAGE_ACCOUNT_NAME="sa02files"
-export STORAGE_RG_NAME="rg-StorageAccounts"
+export STORAGE_RG_NAME=$(az storage account show --name "$STORAGE_ACCOUNT_NAME" --query "resourceGroup" -o tsv)
 
 az role assignment create \
     --assignee $USER_ASSIGNED_CLIENT_ID \
     --role "Storage Blob Data Contributor" \
     --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$STORAGE_RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME"
 
-az role assignment create \
-    --assignee-object-id $USER_ASSIGNED_PRINCIPAL_ID \
-    --role "Storage Blob Data Contributor" \
-    --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$STORAGE_RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME" \
-    --assignee-principal-type ServicePrincipal
+# This step is optional 
+APP_EXTERNAL_IP=$(kubectl get svc aks-storage-service -n storage -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+echo "App External IP: $APP_EXTERNAL_IP"
 
-
-az role assignment list \
-  --assignee $USER_ASSIGNED_CLIENT_ID \
-  --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$STORAGE_RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME" \
-  --output table
-
-echo $USER_ASSIGNED_PRINCIPAL_ID
-echo $USER_ASSIGNED_CLIENT_ID
-echo $AKS_OIDC_ISSUER
-echo $SUBSCRIPTION_ID
-echo $SERVICE_ACCOUNT_NAME
-echo $STORAGE_ACCOUNT_NAME
-echo $STORAGE_RG_NAME
-
-
+az network private-dns record-set a add-record \
+  --resource-group $DNS_ZONE_RG_NAME \
+  --zone-name $PRIVATE_ZONE_NAME \
+  --record-set-name $APP_NAME \
+  --ipv4-address $APP_EXTERNAL_IP
+  

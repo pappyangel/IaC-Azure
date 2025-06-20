@@ -62,13 +62,14 @@ KUBELET_IDENTITY_CLIENT_ID=$(az aks show \
 echo "Kubelet Identity Client ID: $KUBELET_IDENTITY_CLIENT_ID"
 
 # need ACR vars from the variables script in ACR folder
-export ACR_RESOURCE_GROUP_NAME="jfv-rg-acr"
-export ACR_NAME="jfvacr"
+ACR_NAME=$(az acr list --query "[0].name" -o tsv)
+echo "ACR Name: $ACR_NAME"
+ACR_RESOURCE_GROUP_NAME=$(az acr show --name "$ACR_NAME" --query "resourceGroup" -o tsv)
+echo "ACR Resource Group Name: $ACR_RESOURCE_GROUP_NAME"
 
 az role assignment create --assignee $KUBELET_IDENTITY_CLIENT_ID \
    --role AcrPull \
    --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$ACR_RESOURCE_GROUP_NAME/providers/Microsoft.ContainerRegistry/registries/$ACR_NAME
-
 
 # --- Assign 'Private DNS Zone Contributor' Role (idempotent) ---
 az role assignment create \
@@ -137,13 +138,5 @@ az role assignment create \
 #   --zone-name $PRIVATE_ZONE_NAME \
 #   --virtual-network "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$SPOKE_AKS_RG_NAME/providers/Microsoft.Network/virtualNetworks/$SPOKE_AKS_VNET_NAME" \
 #   --registration-enabled false
-
-# This is an optional line.  It shows how to add an A record.  We did this for a test App that may no longer exist.
-# requires corresponding yaml files
-# az network private-dns record-set a add-record \
-#   --resource-group $DNS_ZONE_RG_NAME \
-#   --zone-name $PRIVATE_ZONE_NAME \
-#   --record-set-name aks-api \
-#   --ipv4-address 10.2.0.92 # update accordingly, spoke-id
 
 # End of script finished

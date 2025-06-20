@@ -399,7 +399,7 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 #MACOS
-.DS.Store
+.DS_Store
 
 # supress yaml files with secrets
 deployment.yaml

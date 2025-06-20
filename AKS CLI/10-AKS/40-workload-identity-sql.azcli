@@ -1,3 +1,9 @@
+# run below command if cluster is not created with OIDC issuer enabled & Workload Identity enabled
+az aks update \
+  --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME \
+  --resource-group $SPOKE_AKS_RG_NAME \
+  --enable-oidc-issuer \
+  --enable-workload-identity
 
 export AKS_OIDC_ISSUER=$(
   az aks show \
@@ -6,16 +12,16 @@ export AKS_OIDC_ISSUER=$(
     --query "oidcIssuerProfile.issuerUrl" \
     -o tsv
 )
-
-export SUBSCRIPTION_ID="$(az account show --query id --output tsv)"
+echo "AKS OIDC Issuer: $AKS_OIDC_ISSUER"
 
 # SQL MI
 export USER_ASSIGNED_SQL_MI="sql_mi"
+
 az identity create \
   --name $USER_ASSIGNED_SQL_MI \
   --resource-group $SPOKE_AKS_RG_NAME \
-  --location $LOCATION \
-  --SUBSCRIPTION_ID $SUBSCRIPTION_ID
+  --location $LOCATION  
+
 export USER_ASSIGNED_CLIENT_ID=$(
   az identity show \
     --resource-group $SPOKE_AKS_RG_NAME \
@@ -23,3 +29,75 @@ export USER_ASSIGNED_CLIENT_ID=$(
     --query 'clientId' \
     --output tsv
 )
+
+echo "User Assigned SSQL MI Client ID: $USER_ASSIGNED_CLIENT_ID"
+
+export USER_ASSIGNED_PRINCIPAL_ID=$(
+  az identity show \
+    --resource-group $SPOKE_AKS_RG_NAME \
+    --name $USER_ASSIGNED_SQL_MI \
+    --query principalId \
+    --output tsv
+)
+ 
+az aks get-credentials --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME --resource-group $SPOKE_AKS_RG_NAME
+
+kubectl get nodes,services
+
+export NAMESPACE_NAME="SQL"
+export SERVICE_ACCOUNT_NAME="workload-identity-sql"
+export FEDERATED_IDENTITY_CREDENTIAL_NAME="fed-id-sql"
+export APP_NAME="aks-SQL"
+export CONTAINER_NAME=$APP_NAME
+export DEPLOYMENT_NAME="$APP_NAME-deployment"
+export SERVICE_NAME="$APP_NAME-service"
+export IMAGE_NAME="wi-sql-image"
+export IMAGE_TAG="remote-v1"
+
+#preprocessor for manifest files
+# cd into the directory where the manifest files are located
+envsubst < 1-namespace-var.yaml > namespace.yaml
+envsubst < 2-service-account-var.yaml > service-account.yaml
+envsubst < 3-deployment-var.yaml > deployment.yaml
+envsubst < 4-service-var.yaml > service.yaml
+
+kubectl apply -f namespace.yaml 
+kubectl apply -f service-account.yaml
+
+az identity federated-credential create \
+    --name $FEDERATED_IDENTITY_CREDENTIAL_NAME \
+    --identity-name $USER_ASSIGNED_SQL_MI \
+    --resource-group $SPOKE_AKS_RG_NAME \
+    --issuer $AKS_OIDC_ISSUER \
+    --subject system:serviceaccount:$NAMESPACE_NAME:$SERVICE_ACCOUNT_NAME \
+    --audience api://AzureADTokenExchange
+
+  az identity federated-credential show \
+  --identity-name $USER_ASSIGNED_SQL_MI \
+  --resource-group $SPOKE_AKS_RG_NAME \
+  --name $FEDERATED_IDENTITY_CREDENTIAL_NAME
+
+# deploy app with workload identity
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+
+# add necessary role assignments to the identity
+
+######################################
+-- Run this in your Azure SQL DB as an admin:
+CREATE USER [USER_ASSIGNED_SQL_MI] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [USER_ASSIGNED_SQL_MI];
+ALTER ROLE db_datawriter ADD MEMBER [USER_ASSIGNED_SQL_MI];
+
+######################################
+
+# This step is optional 
+APP_EXTERNAL_IP=$(kubectl get svc aks-sql-service -n sql -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+echo "App External IP: $APP_EXTERNAL_IP"
+
+az network private-dns record-set a add-record \
+  --resource-group $DNS_ZONE_RG_NAME \
+  --zone-name $PRIVATE_ZONE_NAME \
+  --record-set-name $APP_NAME \
+  --ipv4-address $APP_EXTERNAL_IP
+  

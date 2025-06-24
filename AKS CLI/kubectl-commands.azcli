@@ -5,7 +5,8 @@ curl http://aks-storage.privatelink.eastus2.azmk8s.io/getblob
 curl http://aks-storage.privatelink.eastus2.azmk8s.io/
 
 curl http://10.3.0.93/weatherforecast
-curl http://10.3.0.93/gettop10customers
+curl http://10.30.93/gettop10customers
+curl http://aks-sql.privatelink.eastus2.azmk8s.io/gettop10customers
 
 curl http://10.2.0.92/machinename
 
@@ -42,7 +43,7 @@ kubectl get pods --all-namespaces
 kubectl get serviceaccount -n $NAMESPACE_NAME
 kubectl get serviceaccount workload-identity-storage -n storage -o yaml
 
-kubectl rollout restart deployment aks-storage-deployment -n storage
+kubectl rollout restart deployment aks-sql-deployment -n sql
 
 kubectl get serviceaccount workload-identity-storage -n storage -o yaml
 kubectl get pod aks-storage-deployment-6f95667dc8-586tz  -n storage -o jsonpath="{.spec.serviceAccountName}"
@@ -56,4 +57,4 @@ kubectl get pods -n kube-system
 az aks show --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME --resource-group $SPOKE_AKS_RG_NAME --query "oidcIssuerProfile.issuerUrl" -o tsv
 
 kubectl describe sa workload-identity-storage -n storage
-kubectl scale deployment aks-storage-deployment --replicas 1 -n storage
+kubectl scale deployment aks-sql-deployment --replicas 1 -n sql

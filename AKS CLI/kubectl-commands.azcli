@@ -3,7 +3,7 @@ curl http://10.3.0.92/machinename
 curl http://10.3.0.92/getblob
 curl http://aks-storage.privatelink.eastus2.azmk8s.io/getblob
 curl http://aks-storage.privatelink.eastus2.azmk8s.io/
-c
+
 curl http://10.3.0.93/weatherforecast
 curl http://10.3.0.93/gettop10customers
 
@@ -31,6 +31,7 @@ az aks nodepool list \
 kubectl get pods -n sql
 kubectl describe pod aks-storage-deployment-6f75bb9cf-d5rkq -n storage
 kubectl logs -f -l app=aks-sql -n sql
+kubectl logs -f -l app=aks-storage -n storage
 kubectl logs aks-storage-deployment-54465b546f-88np9  -n storage
 
 kubectl get service aks-storage-service -n storage

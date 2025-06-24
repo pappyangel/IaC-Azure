@@ -42,6 +42,7 @@ export USER_ASSIGNED_PRINCIPAL_ID=$(
  
 az aks get-credentials --name $SPOKE_AKS_PRIVATE_CLUSTER_NAME --resource-group $SPOKE_AKS_RG_NAME
 
+# test connectivity is working
 kubectl get nodes,services
 
 export NAMESPACE_NAME="storage"
@@ -52,17 +53,17 @@ export CONTAINER_NAME=$APP_NAME
 export DEPLOYMENT_NAME="$APP_NAME-deployment"
 export SERVICE_NAME="$APP_NAME-service"
 export IMAGE_NAME="wi-storage-image"
-export IMAGE_TAG="remote-v2"
+export IMAGE_TAG="remote-v3"
 
-#preprocessor for manifest files
+# preprocessor for manifest files
 # cd into the directory where the manifest files are located
-envsubst < 1-namespace-var.yaml > namespace.yaml
-envsubst < 2-service-account-var.yaml > service-account.yaml
-envsubst < 3-deployment-var.yaml > deployment.yaml
-envsubst < 4-service-var.yaml > service.yaml
+envsubst < manifest/1-namespace-var.yaml > manifest/namespace.yaml
+envsubst < manifest/2-service-account-var.yaml > manifest/service-account.yaml
+envsubst < manifest/3-deployment-var.yaml > manifest/deployment.yaml
+envsubst < manifest/4-service-var.yaml > manifest/service.yaml
 
-kubectl apply -f namespace.yaml 
-kubectl apply -f service-account.yaml
+kubectl apply -f manifest/namespace.yaml 
+kubectl apply -f manifest/service-account.yaml
 
 az identity federated-credential create \
     --name $FEDERATED_IDENTITY_CREDENTIAL_NAME \
@@ -78,8 +79,8 @@ az identity federated-credential create \
   --name $FEDERATED_IDENTITY_CREDENTIAL_NAME
 
 # deploy app with workload identity
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
+kubectl apply -f manifest/deployment.yaml
+kubectl apply -f manifest/service.yaml
 
 # add necessary role assignments to the identity
 export STORAGE_ACCOUNT_NAME="sa02files"
@@ -90,9 +91,13 @@ az role assignment create \
     --role "Storage Blob Data Contributor" \
     --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$STORAGE_RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME"
 
-# This step is optional 
+# Test the app
 APP_EXTERNAL_IP=$(kubectl get svc aks-storage-service -n storage -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 echo "App External IP: $APP_EXTERNAL_IP"
+
+# test calling app via external IP
+curl http://$APP_EXTERNAL_IP/
+curl http://$APP_EXTERNAL_IP/<endpoint>
 
 az network private-dns record-set a add-record \
   --resource-group $DNS_ZONE_RG_NAME \
@@ -100,3 +105,6 @@ az network private-dns record-set a add-record \
   --record-set-name $APP_NAME \
   --ipv4-address $APP_EXTERNAL_IP
   
+# test calling app via private DNS zone
+curl http://$APP_NAME.$PRIVATE_ZONE_NAME/
+curl http://$APP_NAME.$PRIVATE_ZONE_NAME/<endpoint>

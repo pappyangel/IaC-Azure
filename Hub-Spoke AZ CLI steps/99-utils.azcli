@@ -67,6 +67,11 @@ az network bastion show \
   --query "sku.name" \
   --output tsv
 
+az network bastion list-skus --location eastus2
+
+az network bastion --help
+
+
   #### resolver commands
   export SUBSCRIPTION_ID=$(az account show --query id -o tsv)
   az dns-resolver show --name hub-vnet-dns-resolver --resource-group rg-iac-201 --subscription $SUBSCRIPTION_ID

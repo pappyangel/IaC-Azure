@@ -1,0 +1,106 @@
+# Variables - Update these with your actual values
+export SUBSCRIPTION_ID="your-subscription-id"
+export RESOURCE_GROUP_NAME="your-resource-group"
+export LOCATION="eastus"
+export VNET_NAME="your-vnet-name"
+export SUBNET_NAME="your-subnet-name"
+
+export SQL_SERVER_NAME="your-sql-server"
+export SQL_SERVER_RG_NAME="your-sql-server-rg"
+export PRIVATE_ENDPOINT_NAME="pe-${SQL_SERVER_NAME}"
+export PRIVATE_DNS_ZONE_NAME="privatelink.database.windows.net"
+
+export PRIVATE_DNS_ZONE_RG_NAME="your-dns-zone-rg"
+export PRIVATE_DNS_LINK_NAME="dns-link-${SQL_SERVER_NAME}"
+export NETWORK_INTERFACE_NAME="nic-${PRIVATE_ENDPOINT_NAME}"
+
+# Set subscription context
+az account set --subscription $SUBSCRIPTION_ID
+
+# Get SQL Server resource ID
+export SQL_SERVER_ID=$(az sql server show \
+  --name $SQL_SERVER_NAME \
+  --resource-group $SQL_SERVER_RG_NAME \
+  --query id \
+  --output tsv)
+
+echo "SQL Server ID: $SQL_SERVER_ID"
+
+# Get subnet ID
+export SUBNET_ID=$(az network vnet subnet show \
+  --resource-group $RESOURCE_GROUP_NAME \
+  --vnet-name $VNET_NAME \
+  --name $SUBNET_NAME \
+  --query id \
+  --output tsv)
+
+echo "Subnet ID: $SUBNET_ID"
+
+# Disable private endpoint network policies on the subnet
+az network vnet subnet update \
+  --name $SUBNET_NAME \
+  --resource-group $RESOURCE_GROUP_NAME \
+  --vnet-name $VNET_NAME \
+  --disable-private-endpoint-network-policies true
+
+# Create private endpoint for SQL Server
+az network private-endpoint create \
+  --name $PRIVATE_ENDPOINT_NAME \
+  --resource-group $RESOURCE_GROUP_NAME \
+  --vnet-name $VNET_NAME \
+  --subnet $SUBNET_NAME \
+  --private-connection-resource-id $SQL_SERVER_ID \
+  --group-id sqlServer \
+  --connection-name "connection-${SQL_SERVER_NAME}" \
+  --location $LOCATION
+
+# Get private endpoint IP address
+export PRIVATE_ENDPOINT_IP=$(az network private-endpoint show \
+  --name $PRIVATE_ENDPOINT_NAME \
+  --resource-group $RESOURCE_GROUP_NAME \
+  --query 'customDnsConfigs[0].ipAddresses[0]' \
+  --output tsv)
+
+echo "Private Endpoint IP: $PRIVATE_ENDPOINT_IP"
+
+# Create private DNS zone (if it doesn't exist)
+az network private-dns zone create \
+  --resource-group $PRIVATE_DNS_ZONE_RG_NAME \
+  --name $PRIVATE_DNS_ZONE_NAME
+
+# Link private DNS zone to VNet
+az network private-dns link vnet create \
+  --resource-group $PRIVATE_DNS_ZONE_RG_NAME \
+  --zone-name $PRIVATE_DNS_ZONE_NAME \
+  --name $PRIVATE_DNS_LINK_NAME \
+  --virtual-network $VNET_NAME \
+  --registration-enabled false
+
+# Create DNS zone group for automatic DNS registration
+az network private-endpoint dns-zone-group create \
+  --resource-group $RESOURCE_GROUP_NAME \
+  --endpoint-name $PRIVATE_ENDPOINT_NAME \
+  --name "sqlserver-dns-zone-group" \
+  --private-dns-zone $PRIVATE_DNS_ZONE_NAME \
+  --zone-name sql
+
+# Verify private endpoint connection
+az network private-endpoint show \
+  --name $PRIVATE_ENDPOINT_NAME \
+  --resource-group $RESOURCE_GROUP_NAME \
+  --query 'privateLinkServiceConnections[0].privateLinkServiceConnectionState'
+
+# Test DNS resolution (optional)
+echo "Testing DNS resolution for $SQL_SERVER_NAME.database.windows.net"
+nslookup $SQL_SERVER_NAME.database.windows.net
+
+# Display connection information
+echo ""
+echo "Private Endpoint Setup Complete!"
+echo "SQL Server: $SQL_SERVER_NAME"
+echo "Private Endpoint: $PRIVATE_ENDPOINT_NAME"
+echo "Private IP: $PRIVATE_ENDPOINT_IP"
+echo "DNS Zone: $PRIVATE_DNS_ZONE_NAME"
+echo ""
+echo "Connection string should use: $SQL_SERVER_NAME.database.windows.net"
+echo "This will now resolve to the private IP: $PRIVATE_ENDPOINT_IP"

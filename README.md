@@ -1,5 +1,6 @@
 # IaC-Azure
 
-WIP Diagram- Work in Progress
+This is a diagram of the architeture this repo builds
 
-![image](https://github.com/user-attachments/assets/7e4174c1-fb52-4894-be14-a047cfb242b0)
+![image](https://github.com/user-attachments/assets/6f82abe0-5cba-4e9a-9adc-eee83009001f)
+![image](https://github.com/user-attachments/assets/6f82abe0-5cba-4e9a-9adc-eee83009001f)

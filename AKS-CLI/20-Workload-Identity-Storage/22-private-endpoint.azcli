@@ -1,5 +1,4 @@
 # Source the variables from the AKS variables file
-source ../../Hub-Spoke-AZ-CLI/00-batch-run-vars.azcli
 source ../10-AKS/00-variables.azcli
 
 # Source local secrets 

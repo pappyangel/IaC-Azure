@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # WARNING these variables come from the hub/spoke IaC scripts - check for accuracy    
-source ../../"Hub-Spoke AZ CLI steps"/00-batch-run-vars.azcli
-echo $BATCHRUN
+source ../../Hub-Spoke-AZ-CLI/00-batch-run-vars.azcli
 
 # --- Set Spoke ID ---
 export SPOKE_ID="3" # this is important, change it to 1, 2, 3, etc. for each spoke
@@ -26,6 +25,7 @@ export SPOKE_AKS_SERVICE_CIDR="10.1${SPOKE_ID}0.0.0/16"
 export SPOKE_AKS_DNS_SERVICE_IP="10.1${SPOKE_ID}0.0.10"
 
 # echo for testing
+# echo $BATCHRUN
 # echo $SPOKE_ID
 # echo $SPOKE_AKS_RG_NAME
 # echo $SPOKE_AKS_PRIVATE_CLUSTER_NAME

@@ -1,7 +1,12 @@
-# Set variables
-export ACR_RESOURCE_GROUP_NAME="jfv-rg-acr"
-export ACR_NAME="jfvacr"
+# Source local secrets 
+source ../../.env.local
+
+# ACR_NAME - from secrets
+export ACR_RESOURCE_GROUP_NAME=$(az acr show --name "$ACR_NAME" --query "resourceGroup" -o tsv 2>/dev/null || echo "")
 export LOCATION="eastus2"
+
+echo "ACR Name: $ACR_NAME"
+echo "ACR Resource Group: $ACR_RESOURCE_GROUP_NAME"
 
 # Create the resource group if it doesn't exist
 az group create --name $ACR_RESOURCE_GROUP_NAME --location $LOCATION

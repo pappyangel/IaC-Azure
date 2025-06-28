@@ -17,5 +17,3 @@ az network vnet peering create \
   --remote-vnet $HUB_VNET_NAME \
   --allow-vnet-access \
   --allow-forwarded-traffic >> $BATCHRUN.txt 2>&1 < /dev/null
-
-

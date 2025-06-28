@@ -73,7 +73,7 @@ az identity federated-credential create \
     --subject system:serviceaccount:$NAMESPACE_NAME:$SERVICE_ACCOUNT_NAME \
     --audience api://AzureADTokenExchange
 
-  az identity federated-credential show \
+az identity federated-credential show \
   --identity-name $USER_ASSIGNED_SQL_MI \
   --resource-group $SPOKE_AKS_RG_NAME \
   --name $FEDERATED_IDENTITY_CREDENTIAL_NAME

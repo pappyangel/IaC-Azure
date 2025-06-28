@@ -83,7 +83,6 @@ kubectl apply -f manifest/deployment.yaml
 kubectl apply -f manifest/service.yaml
 
 # add necessary role assignments to the identity
-export STORAGE_ACCOUNT_NAME="sa02files"
 export STORAGE_RG_NAME=$(az storage account show --name "$STORAGE_ACCOUNT_NAME" --query "resourceGroup" -o tsv)
 
 az role assignment create \

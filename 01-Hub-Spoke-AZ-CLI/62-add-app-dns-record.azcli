@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# this was set as a test value.  
+# This will be replaced/updated with workload identity scripts later.
 az network private-dns record-set a add-record \
   --resource-group $HUB_RG_NAME \
   --zone-name private.hubspoke1.com \

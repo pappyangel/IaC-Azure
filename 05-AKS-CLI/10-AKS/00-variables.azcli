@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # WARNING these variables come from the hub/spoke IaC scripts - check for accuracy    
-source ../../Hub-Spoke-AZ-CLI/00-batch-run-vars.azcli
+source ../../01-Hub-Spoke-AZ-CLI/00-batch-run-vars.azcli
 
-# --- Set Spoke ID ---
+# --- Set Spoke ID --- max 10 spokes (0-9)
 export SPOKE_ID="3" # this is important, change it to 1, 2, 3, etc. for each spoke
 
 # --- Spoke Variables ---

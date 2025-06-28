@@ -1,10 +1,10 @@
 # Source the variables from the AKS variables file
-source "../../Hub-Spoke-AZ-CLI/00-batch-run-vars.azcli"
+source ../../01-Hub-Spoke-AZ-CLI/00-batch-run-vars.azcli
 source ../10-AKS/00-variables.azcli
+source ../../.env.local
 
 # SQL Server specific variables - Update these with your actual values
-export SQL_SERVER_NAME="jfv-sql"
-export SQL_SERVER_RG_NAME="rg-DataServices"
+
 export PRIVATE_ENDPOINT_NAME="sql-private-endpoint-${SPOKE_AKS_PRIVATE_CLUSTER_NAME}" 
 export PRIVATE_DNS_ZONE_NAME="privatelink.database.windows.net"
 

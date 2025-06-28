@@ -11,8 +11,3 @@ az network vnet peering update \
   --vnet-name $SPOKE_1_VNET_NAME \
   --name $SPOKE1_TO_HUB_PEERING_NAME \
   --set useRemoteGateways=true >> $BATCHRUN.txt 2>&1 < /dev/null
-
-# add this after VPN Gateway is created 
-  #\   --allow-gateway-transit
-  # add this after VPN Gateway is created 
-  #\   --use-remote-gateways

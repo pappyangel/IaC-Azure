@@ -62,8 +62,6 @@ KUBELET_IDENTITY_CLIENT_ID=$(az aks show \
 echo "Kubelet Identity Client ID: $KUBELET_IDENTITY_CLIENT_ID"
 
 # need ACR vars from the variables script in ACR folder
-ACR_NAME=$(az acr list --query "[0].name" -o tsv)
-echo "ACR Name: $ACR_NAME"
 ACR_RESOURCE_GROUP_NAME=$(az acr show --name "$ACR_NAME" --query "resourceGroup" -o tsv)
 echo "ACR Resource Group Name: $ACR_RESOURCE_GROUP_NAME"
 

@@ -398,8 +398,16 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-#MACOS
+
+# Local environment files
+.env.local
+.env
+secrets.env
+*.local.env
+
+# OS generated files
 .DS_Store
+Thumbs.db
 
 # supress yaml files with secrets
 deployment.yaml

@@ -1,13 +1,15 @@
 # Source the variables from the AKS variables file
-source "../../Hub-Spoke-AZ-CLI/00-batch-run-vars.azcli"
+source ../../Hub-Spoke-AZ-CLI/00-batch-run-vars.azcli
 source ../10-AKS/00-variables.azcli
 
-# Storage Account specific variables - Update these with your actual values
-export STORAGE_ACCOUNT_NAME="your-storage-account"
-export STORAGE_ACCOUNT_RG_NAME="your-storage-rg"
+# Source local secrets 
+source ../../.env.local
 
-export STORAGE_ACCOUNT_NAME="sa02files"
-export STORAGE_RG_NAME=$(az storage account show --name "$STORAGE_ACCOUNT_NAME" --query "resourceGroup" -o tsv)
+# STORAGE_ACCOUNT_NAME - from secrets
+export STORAGE_ACCOUNT_RG_NAME=$(az storage account show --name "$STORAGE_ACCOUNT_NAME" --query "resourceGroup" -o tsv)
+
+echo "Storage Account: $STORAGE_ACCOUNT_NAME"
+echo "Storage Account Resource Group: $STORAGE_ACCOUNT_RG_NAME"
 
 export PRIVATE_ENDPOINT_NAME="storage-private-endpoint-${SPOKE_AKS_PRIVATE_CLUSTER_NAME}" 
 export PRIVATE_DNS_ZONE_NAME="privatelink.blob.core.windows.net"
@@ -96,8 +98,6 @@ export DNS_ZONE_ID=$(az network private-dns zone show \
   --name $PRIVATE_DNS_ZONE_NAME \
   --query id \
   --output tsv)
-
-echo "DNS Zone ID: $DNS_ZONE_ID"
 
 # Create DNS zone group for automatic DNS registration
 az network private-endpoint dns-zone-group create \

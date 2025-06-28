@@ -28,8 +28,6 @@ export HUB_TO_SPOKE_1_PEERING_NAME="hub-to-spoke1-peering"
 export SPOKE1_TO_HUB_PEERING_NAME="spoke1-to-hub-peering"
 
 # these are variables for the creation of the P2S VPN GW
-# this is not to do with the vnets Hub or Spoke
-# the p2s vpn gw is connecting on-premise to the azure vnet
 export VPN_PIP_NAME="vpn-pip"
 export VPN_GATEWAY_NAME="vpn-onprem-gw"
 export GATEWAY_SUBNET_PREFIX="10.0.1.64/27"
@@ -42,20 +40,20 @@ export HUBSPOKE1_PRIVATE_DNS_ZONE="private.hubspoke1.com"
 export HUB_DNS_LINK_NAME="vnl-hub-1"
 export SPOKE_1_DNS_LINK_NAME="vnl-spoke-1"
 
-echo "Creating Variables END"
+# test variable definitions
 
-echo "BATCHRUN=$BATCHRUN"
-echo "HUB_RG_NAME=$HUB_RG_NAME"
-echo "LOCATION=$LOCATION"
-echo "HUB_VNET_NAME=$HUB_VNET_NAME"
-echo "HUB_VNET_PREFIX=$HUB_VNET_PREFIX"
-echo "HUB_DEFAULT_SUBNET_NAME=$HUB_DEFAULT_SUBNET_NAME"
-echo "HUB_DEFAULT_SUBNET_PREFIX=$HUB_DEFAULT_SUBNET_PREFIX"
-echo "HUB_SECOND_SUBNET_NAME=$HUB_SECOND_SUBNET_NAME"
-echo "HUB_SECOND_SUBNET_PREFIX=$HUB_SECOND_SUBNET_PREFIX"
-echo "IMAGE=$IMAGE"
-echo "VM_ADMIN_USER=$VM_ADMIN_USER"
-
+# echo "Creating Variables END"
+# echo "BATCHRUN=$BATCHRUN"
+# echo "HUB_RG_NAME=$HUB_RG_NAME"
+# echo "LOCATION=$LOCATION"
+# echo "HUB_VNET_NAME=$HUB_VNET_NAME"
+# echo "HUB_VNET_PREFIX=$HUB_VNET_PREFIX"
+# echo "HUB_DEFAULT_SUBNET_NAME=$HUB_DEFAULT_SUBNET_NAME"
+# echo "HUB_DEFAULT_SUBNET_PREFIX=$HUB_DEFAULT_SUBNET_PREFIX"
+# echo "HUB_SECOND_SUBNET_NAME=$HUB_SECOND_SUBNET_NAME"
+# echo "HUB_SECOND_SUBNET_PREFIX=$HUB_SECOND_SUBNET_PREFIX"
+# echo "IMAGE=$IMAGE"
+# echo "VM_ADMIN_USER=$VM_ADMIN_USER"
 
 #echo "VM_ADMIN_PASSWORD=$VM_ADMIN_PASSWORD"
 #echo "GHCS_ADMIN_PASSWORD=$GHCS_ADMIN_PASSWORD"
@@ -63,7 +61,3 @@ echo "VM_ADMIN_USER=$VM_ADMIN_USER"
 #echo AAD_TENANT_URI=$AAD_TENANT_URI
 #echo AAD_AUDIENCE_ID=$AAD_AUDIENCE_ID
 #echo AAD_ISSUER_URI=$AAD_ISSUER_URI
-
-
-
-echo "Script END"

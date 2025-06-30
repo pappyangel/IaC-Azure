@@ -7,6 +7,9 @@ curl http://aks-storage.privatelink.eastus2.azmk8s.io/
 curl http://10.3.0.93/weatherforecast
 curl http://10.3.93/gettop10customers
 curl http://aks-sql.privatelink.eastus2.azmk8s.io/gettop10customers
+curl http://aks-sql.privatelink.eastus2.azmk8s.io/weatherforecast
+curl http://aks-sql.privatelink.eastus2.azmk8s.io/
+curl http://aks-sql.privatelink.eastus2.azmk8s.io/machinename
 
 curl http://10.2.0.92/machinename
 

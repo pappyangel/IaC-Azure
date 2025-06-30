@@ -53,7 +53,7 @@ export CONTAINER_NAME=$APP_NAME
 export DEPLOYMENT_NAME="$APP_NAME-deployment"
 export SERVICE_NAME="$APP_NAME-service"
 export IMAGE_NAME="wi-sql-image"
-export IMAGE_TAG="remote-v1"
+export IMAGE_TAG="remote-v2"
 
 # preprocessor for manifest files
 # cd into the directory where the manifest files are located
